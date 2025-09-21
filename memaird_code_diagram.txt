@@ -1,0 +1,179 @@
+erDiagram
+    %% =====================
+    %% Sistema Django
+    %% =====================
+    Usuario { int id PK
+              char email
+              char senha }
+    Grupo { int id PK
+            char nome }
+    Permissao { int id PK
+                char codigo }
+    UsuarioGrupo { int id PK
+                   int usuario FK
+                   int grupo FK }
+    UsuarioPermissao { int id PK
+                       int usuario FK
+                       int permissao FK }
+    GrupoPermissao { int id PK
+                     int grupo FK
+                     int permissao FK }
+
+    %% =====================
+    %% ERP Odontologico
+    %% =====================
+    Paciente { int id PK
+               char nome
+               char cpf
+               date data_nascimento
+               char telefone
+               char email
+               char endereco
+               datetime criado_em
+               datetime atualizado_em }
+
+    Consulta { int id PK
+               int paciente FK
+               char status
+               datetime inicio
+               datetime fim
+               char sala
+               text observacoes
+               datetime criado_em }
+
+    Lembrete { int id PK
+               int consulta FK
+               char canal
+               datetime agendado_em
+               datetime enviado_em
+               char status }
+
+    EvolucaoClinica { int id PK
+                      int consulta FK
+                      int usuario FK
+                      text anotacao
+                      datetime criado_em }
+
+    Odontograma { int id PK
+                  int paciente FK
+                  char dente
+                  char superficie
+                  char condicao
+                  int procedimento_executado FK
+                  datetime criado_em }
+
+    Anexo { int id PK
+            int paciente FK
+            int consulta FK
+            char caminho_arquivo
+            char tipo_arquivo
+            datetime criado_em }
+
+    PlanoTratamento { int id PK
+                      int paciente FK
+                      char status
+                      datetime criado_em }
+
+    ProcedimentoPlanejado { int id PK
+                            int plano FK
+                            int procedimento FK
+                            char dente_superficie
+                            int quantidade
+                            decimal valor_unitario
+                            char status }
+
+    CatalogoProcedimento { int id PK
+                           char codigo
+                           char nome
+                           int duracao_min
+                           decimal preco_base }
+
+    Orcamento { int id PK
+                int plano FK
+                decimal total
+                decimal desconto
+                date validade
+                datetime aprovado_em }
+
+    Fatura { int id PK
+             int paciente FK
+             char origem
+             decimal valor
+             char status
+             char numero_nfse }
+
+    Pagamento { int id PK
+                int fatura FK
+                char metodo_pagamento
+                decimal valor
+                datetime pago_em
+                int parcela }
+
+    ItemEstoque { int id PK
+                  char descricao
+                  char marca
+                  char lote
+                  date validade
+                  int qtd_minima
+                  int qtd_atual }
+
+    MovimentoEstoque { int id PK
+                       int item FK
+                       char tipo_movimento
+                       int quantidade
+                       char motivo
+                       int consulta FK
+                       datetime criado_em }
+
+    TermoConsentimento { int id PK
+                         int paciente FK
+                         int procedimento FK
+                         text texto
+                         datetime assinado_em
+                         char caminho_assinatura }
+
+    Receita { int id PK
+              int consulta FK
+              text texto
+              datetime criado_em }
+
+    %% >>> NOVO <<<
+    ProcedimentoExecutado { int id PK
+                            int consulta FK
+                            int planejado FK
+                            int procedimento FK
+                            char dente
+                            char superficie
+                            int quantidade
+                            decimal valor_unitario
+                            datetime realizado_em
+                            text observacoes }
+
+    %% =====================
+    %% Relacoes
+    %% =====================
+    Paciente ||--o{ Consulta : agenda
+    Consulta ||--o{ Lembrete : gera
+    Consulta ||--o{ EvolucaoClinica : contem
+    Paciente ||--o{ Odontograma : possui
+    Paciente ||--o{ Anexo : vincula
+    Consulta ||--o{ Anexo : vincula
+
+    Paciente ||--o{ PlanoTratamento : possui
+    PlanoTratamento ||--o{ ProcedimentoPlanejado : inclui
+    ProcedimentoPlanejado }o--|| CatalogoProcedimento : referencia
+    PlanoTratamento ||--o{ Orcamento : gera
+
+    Consulta ||--o{ ProcedimentoExecutado : contem
+    ProcedimentoExecutado }o--|| ProcedimentoPlanejado : deriva
+    ProcedimentoExecutado }o--|| CatalogoProcedimento : usa
+    ProcedimentoExecutado ||--o{ Odontograma : atualiza
+
+    Paciente ||--o{ Fatura : recebe
+    Fatura ||--o{ Pagamento : liquida
+
+    ItemEstoque ||--o{ MovimentoEstoque : movimenta
+    Consulta ||--o{ MovimentoEstoque : consome
+    Paciente ||--o{ TermoConsentimento : assina
+    CatalogoProcedimento ||--o{ TermoConsentimento : relacionado
+    Consulta ||--o{ Receita : emite
