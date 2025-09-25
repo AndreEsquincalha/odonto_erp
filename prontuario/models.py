@@ -1,5 +1,8 @@
 from django.db import models
+from django.conf import settings
 from pacientes.models import Paciente
+from consultas.models import Consulta
+from tratamentos.models import CatalogoProcedimento, ProcedimentoExecutado
 
 class Odontograma(models.Model):
     class Dente(models.TextChoices):
@@ -92,8 +95,11 @@ class Odontograma(models.Model):
         blank=True
     )
     condicao = models.CharField(max_length=100)
+    procedimento_executado = models.ForeignKey(
+        ProcedimentoExecutado, on_delete=models.SET_NULL, null=True, blank=True, related_name="alteracoes_odontograma"
+    )
     criado_em = models.DateTimeField(auto_now_add=True)
-
+    
     class Meta:
         ordering = ["paciente", "dente"]
         verbose_name = "Odontograma"
@@ -103,3 +109,64 @@ class Odontograma(models.Model):
         if self.superficie:
             return f"{self.paciente.nome} - Dente {self.dente} ({self.get_superficie_display()}): {self.condicao}"
         return f"{self.paciente.nome} - Dente {self.dente}: {self.condicao}"
+
+
+class EvolucaoClinica(models.Model):
+    consulta = models.ForeignKey(Consulta, on_delete=models.CASCADE, related_name="evolucoes")
+    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="evolucoes_clinicas")
+    anotacao = models.TextField()
+    criado_em = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-criado_em"]
+        verbose_name = "Evolução Clínica"
+        verbose_name_plural = "Evoluções Clínicas"
+
+    def __str__(self):
+        return f"Evolução {self.consulta.paciente.nome} ({self.criado_em:%d/%m/%Y %H:%M})"
+
+
+class Anexo(models.Model):
+    paciente = models.ForeignKey(Paciente, on_delete=models.PROTECT, related_name="anexos")
+    consulta = models.ForeignKey(Consulta, on_delete=models.PROTECT, related_name="anexos")
+    caminho_arquivo = models.CharField(max_length=300)
+    tipo_arquivo = models.CharField(max_length=50, blank=True)
+    criado_em = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-criado_em"]
+        verbose_name = "Anexo"
+        verbose_name_plural = "Anexos"
+
+    def __str__(self):
+        return f"Anexo: {self.caminho_arquivo}"
+
+
+class Receita(models.Model):
+    consulta = models.ForeignKey(Consulta, on_delete=models.PROTECT, related_name="receitas")
+    texto = models.TextField()
+    criado_em = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-criado_em"]
+        verbose_name = "Receita"
+        verbose_name_plural = "Receitas"
+
+    def __str__(self):
+        return f"Receita de {self.consulta.paciente.nome} ({self.criado_em:%d/%m/%Y})"
+
+
+class TermoConsentimento(models.Model):
+    paciente = models.ForeignKey(Paciente, on_delete=models.PROTECT, related_name="termos_consentimento")
+    procedimento = models.ForeignKey(CatalogoProcedimento, on_delete=models.PROTECT, related_name="termos")
+    texto = models.TextField()
+    assinado_em = models.DateTimeField(null=True, blank=True)
+    caminho_assinatura = models.CharField(max_length=300, blank=True)
+
+    class Meta:
+        ordering = ["-assinado_em"]
+        verbose_name = "Termo de Consentimento"
+        verbose_name_plural = "Termos de Consentimento"
+
+    def __str__(self):
+        return f"Termo de {self.paciente.nome} - {self.procedimento.nome}"
