@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Consultas - ERP Odontológico{% endblock %}
+
+{% block content %}
+<div class="mb-6 flex justify-between items-center">
+    <h1 class="text-2xl font-bold text-gray-900">Consultas</h1>
+    <a href="{% url 'consultas:create' %}"
+        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+        Nova Consulta
+    </a>
+</div>
+
+{% include "partials/_search_filter.html" %}
+
+{% block additional_filters %}
+<div>
+    <label for="status" class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+    <select name="status" id="status"
+        class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+        <option value="">Todos</option>
+        <option value="AG" {% if request.GET.status=='AG' %}selected{% endif %}>Agendada</option>
+        <option value="CF" {% if request.GET.status=='CF' %}selected{% endif %}>Confirmada</option>
+        <option value="EA" {% if request.GET.status=='EA' %}selected{% endif %}>Em Andamento</option>
+        <option value="CO" {% if request.GET.status=='CO' %}selected{% endif %}>Concluída</option>
+        <option value="CA" {% if request.GET.status=='CA' %}selected{% endif %}>Cancelada</option>
+        <option value="FA" {% if request.GET.status=='FA' %}selected{% endif %}>Faltou</option>
+    </select>
+</div>
+<div>
+    <label for="start" class="block text-sm font-medium text-gray-700 mb-1">Data Início</label>
+    <input type="date" name="start" id="start" value="{{ request.GET.start }}"
+        class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+</div>
+<div>
+    <label for="end" class="block text-sm font-medium text-gray-700 mb-1">Data Fim</label>
+    <input type="date" name="end" id="end" value="{{ request.GET.end }}"
+        class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+</div>
+{% endblock %}
+
+<div class="bg-white shadow overflow-hidden sm:rounded-lg">
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th scope="col"
+                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Início
+                    </th>
+                    <th scope="col"
+                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fim</th>
+                    <th scope="col"
+                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Paciente
+                    </th>
+                    <th scope="col"
+                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status
+                    </th>
+                    <th scope="col"
+                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sala</th>
+                    <th scope="col"
+                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações
+                    </th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                {% for consulta in consultas %}
+                <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm font-medium text-gray-900">{{ consulta.inicio|date:"d/m/Y H:i" }}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-500">{{ consulta.fim|date:"d/m/Y H:i" }}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm font-medium text-gray-900">{{ consulta.paciente.nome }}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        {% if consulta.status == 'AG' %}
+                        <span
+                            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Agendada</span>
+                        {% elif consulta.status == 'CF' %}
+                        <span
+                            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Confirmada</span>
+                        {% elif consulta.status == 'EA' %}
+                        <span
+                            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Em
+                            Andamento</span>
+                        {% elif consulta.status == 'CO' %}
+                        <span
+                            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">Concluída</span>
+                        {% elif consulta.status == 'CA' %}
+                        <span
+                            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Cancelada</span>
+                        {% elif consulta.status == 'FA' %}
+                        <span
+                            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-orange-100 text-orange-800">Faltou</span>
+                        {% endif %}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-500">{{ consulta.sala }}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <a href="{% url 'consultas:detail' consulta.id %}"
+                            class="text-blue-600 hover:text-blue-900 mr-3">Detalhes</a>
+                        <a href="{% url 'consultas:update' consulta.id %}"
+                            class="text-indigo-600 hover:text-indigo-900 mr-3">Editar</a>
+
+                        <!-- Quick status buttons -->
+                        <div class="inline-flex space-x-1">
+                            <form method="post" action="{% url 'consultas:set_status' consulta.id 'CF' %}"
+                                class="inline">
+                                {% csrf_token %}
+                                <button type="submit" class="text-blue-600 hover:text-blue-900 text-xs"
+                                    title="Confirmar">CF</button>
+                            </form>
+                            <span>|</span>
+                            <form method="post" action="{% url 'consultas:set_status' consulta.id 'EA' %}"
+                                class="inline">
+                                {% csrf_token %}
+                                <button type="submit" class="text-yellow-600 hover:text-yellow-900 text-xs"
+                                    title="Em Andamento">EA</button>
+                            </form>
+                            <span>|</span>
+                            <form method="post" action="{% url 'consultas:set_status' consulta.id 'CO' %}"
+                                class="inline">
+                                {% csrf_token %}
+                                <button type="submit" class="text-gray-600 hover:text-gray-900 text-xs"
+                                    title="Concluir">CO</button>
+                            </form>
+                            <span>|</span>
+                            <form method="post" action="{% url 'consultas:set_status' consulta.id 'CA' %}"
+                                class="inline">
+                                {% csrf_token %}
+                                <button type="submit" class="text-red-600 hover:text-red-900 text-xs"
+                                    title="Cancelar">CA</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">
+                        Nenhuma consulta encontrada.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% include "partials/_pagination.html" %}
+{% endblock %}

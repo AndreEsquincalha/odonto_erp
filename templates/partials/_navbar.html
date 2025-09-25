@@ -1,0 +1,23 @@
+<nav class="bg-blue-600 shadow-lg">
+    <div class="max-w-7xl mx-auto px-4">
+        <div class="flex justify-between h-16">
+            <div class="flex items-center">
+                <a href="/" class="text-white text-xl font-bold">ERP Odontológico</a>
+            </div>
+            <div class="flex space-x-4 items-center">
+                <a href="{% url 'pacientes:list' %}"
+                    class="text-white hover:bg-blue-700 px-3 py-2 rounded-md">Pacientes</a>
+                <a href="{% url 'consultas:list' %}"
+                    class="text-white hover:bg-blue-700 px-3 py-2 rounded-md">Consultas</a>
+                <a href="{% url 'prontuario:odontograma_list' %}"
+                    class="text-white hover:bg-blue-700 px-3 py-2 rounded-md">Prontuário</a>
+                <a href="{% url 'tratamentos:plano_list' %}"
+                    class="text-white hover:bg-blue-700 px-3 py-2 rounded-md">Tratamentos</a>
+                <a href="{% url 'financeiro:fatura_list' %}"
+                    class="text-white hover:bg-blue-700 px-3 py-2 rounded-md">Financeiro</a>
+                <a href="{% url 'estoque:item_list' %}"
+                    class="text-white hover:bg-blue-700 px-3 py-2 rounded-md">Estoque</a>
+            </div>
+        </div>
+    </div>
+</nav>
