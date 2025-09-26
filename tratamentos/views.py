@@ -6,6 +6,7 @@ from django.contrib import messages
 from django.forms import inlineformset_factory
 from .models import PlanoTratamento, CatalogoProcedimento, ProcedimentoPlanejado, ProcedimentoExecutado
 from .forms import PlanoTratamentoForm, CatalogoProcedimentoForm, ProcedimentoPlanejadoForm, ProcedimentoExecutadoForm
+from pacientes.models import Paciente
 
 class PlanoListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     model = PlanoTratamento
@@ -16,13 +17,25 @@ class PlanoListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
 
     def get_queryset(self):
         qs = super().get_queryset().select_related("paciente")
+
         pid = self.request.GET.get("paciente")
         if pid:
             qs = qs.filter(paciente_id=pid)
+
         status = self.request.GET.get("status")
-        if status:
+        valid = {code for code, _ in PlanoTratamento.Status.choices}
+        if status in valid:
             qs = qs.filter(status=status)
+
         return qs
+    
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx["pacientes"] = Paciente.objects.only("id", "nome").order_by("nome")
+        ctx["current_status"] = self.request.GET.get("status", "")
+        ctx["current_paciente"] = self.request.GET.get("paciente", "")
+        return ctx
+
 
 class PlanoDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
     model = PlanoTratamento
