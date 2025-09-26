@@ -20,12 +20,12 @@
     <select name="status" id="status"
         class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
         <option value="">Todos</option>
-        <option value="AG" {% if request.GET.status=='AG' %}selected{% endif %}>Agendada</option>
-        <option value="CF" {% if request.GET.status=='CF' %}selected{% endif %}>Confirmada</option>
-        <option value="EA" {% if request.GET.status=='EA' %}selected{% endif %}>Em Andamento</option>
-        <option value="CO" {% if request.GET.status=='CO' %}selected{% endif %}>Concluída</option>
-        <option value="CA" {% if request.GET.status=='CA' %}selected{% endif %}>Cancelada</option>
-        <option value="FA" {% if request.GET.status=='FA' %}selected{% endif %}>Faltou</option>
+        <option value="AG" {% if request.GET.status == 'AG' %}selected{% endif %}>Agendada</option>
+        <option value="CF" {% if request.GET.status == 'CF' %}selected{% endif %}>Confirmada</option>
+        <option value="EA" {% if request.GET.status == 'EA' %}selected{% endif %}>Em Andamento</option>
+        <option value="CO" {% if request.GET.status == 'CO' %}selected{% endif %}>Concluída</option>
+        <option value="CA" {% if request.GET.status == 'CA' %}selected{% endif %}>Cancelada</option>
+        <option value="FA" {% if request.GET.status == 'FA' %}selected{% endif %}>Faltou</option>
     </select>
 </div>
 <div>

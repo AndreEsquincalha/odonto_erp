@@ -21,8 +21,7 @@
         class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
         <option value="">Todos os pacientes</option>
         {% for paciente in pacientes %}
-        <option value="{{ paciente.id }}" {% if request.GET.paciente==paciente.id|stringformat:"s" %}selected{% endif
-            %}>{{ paciente.nome }}</option>
+        <option value="{{ paciente.id }}" {% if request.GET.paciente == paciente.id|stringformat:"s" %}selected{% endif%}>{{ paciente.nome }}</option>
         {% endfor %}
     </select>
 </div>

@@ -1,14 +1,12 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}{% if form.instance.id %}Editar Item{% else %}Novo Item{% endif %} - ERP Odontológico{% endblock %}
+{% block title %}Editar Procedimento Planejado - ERP Odontológico{% endblock %}
 
 {% block content %}
 <div class="mb-6 flex justify-between items-center">
-    <h1 class="text-2xl font-bold text-gray-900">
-        {% if form.instance.id %}Editar Item{% else %}Novo Item{% endif %}
-    </h1>
-    <a href="{% url 'estoque:item_list' %}"
+    <h1 class="text-2xl font-bold text-gray-900">Editar Procedimento Planejado</h1>
+    <a href="{% url 'tratamentos:plano_detail' planejado.plano.id %}"
         class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-gray-700 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
         Voltar
     </a>
@@ -16,6 +14,11 @@
 
 <div class="bg-white shadow overflow-hidden sm:rounded-lg">
     <div class="px-4 py-5 sm:p-6">
+        <div class="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-md">
+            <p class="text-sm text-blue-700">Editando procedimento do plano de tratamento de <strong>{{
+                    planejado.plano.paciente.nome }}</strong></p>
+        </div>
+
         <form method="post">
             {% csrf_token %}
 
@@ -34,15 +37,7 @@
                         {{ field.label }}
                         {% if field.field.required %}<span class="text-red-500">*</span>{% endif %}
                     </label>
-
-                    {% if field.name == 'validade' %}
-                    <input type="date" name="{{ field.name }}" id="{{ field.id_for_label }}"
-                        value="{% if field.value %}{{ field.value|date:'Y-m-d' }}{% endif %}"
-                        class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
-                    {% else %}
                     {{ field }}
-                    {% endif %}
-
                     {% if field.errors %}
                     <div class="mt-1 text-sm text-red-600">
                         {% for error in field.errors %}
@@ -58,13 +53,13 @@
             </div>
 
             <div class="mt-6 flex justify-end space-x-3">
-                <a href="{% url 'estoque:item_list' %}"
+                <a href="{% url 'tratamentos:plano_detail' planejado.plano.id %}"
                     class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                     Cancelar
                 </a>
                 <button type="submit"
                     class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                    {% if form.instance.id %}Atualizar{% else %}Criar{% endif %} Item
+                    Atualizar Procedimento
                 </button>
             </div>
         </form>
