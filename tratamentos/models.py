@@ -11,7 +11,7 @@ class PlanoTratamento(models.Model):
         CONCLUIDO = "CO", "Concluído"
         CANCELADO = "CA", "Cancelado"
 
-    paciente = models.ForeignKey(Paciente, on_delete=models.PROTECT, related_name="planos_tratamento")
+    paciente = models.ForeignKey(Paciente, on_delete=models.CASCADE, related_name="planos_tratamento")
     status = models.CharField(
         max_length=2,
         choices=Status.choices,
@@ -67,7 +67,7 @@ class ProcedimentoPlanejado(models.Model):
 
 
 class ProcedimentoExecutado(models.Model):
-    consulta = models.ForeignKey(Consulta, on_delete=models.PROTECT, related_name="procedimentos_executados")
+    consulta = models.ForeignKey(Consulta, on_delete=models.CASCADE, related_name="procedimentos_executados")
     planejado = models.ForeignKey(ProcedimentoPlanejado, on_delete=models.SET_NULL, null=True, blank=True, related_name="execucoes")
     procedimento = models.ForeignKey(CatalogoProcedimento, on_delete=models.PROTECT, related_name="executados")
     dente = models.CharField(max_length=2)        # pode usar choices FDI se preferir

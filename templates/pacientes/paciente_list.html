@@ -6,10 +6,16 @@
 {% block content %}
 <div class="mb-6 flex justify-between items-center">
     <h1 class="text-2xl font-bold text-gray-900">Pacientes</h1>
-    <a href="{% url 'pacientes:create' %}"
-        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-        Novo Paciente
-    </a>
+    <div class="space-x-2">
+        <a href="{% url 'pacientes:archived_list' %}"
+            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500">
+            Reativar Pacientes
+        </a>
+        <a href="{% url 'pacientes:create' %}"
+            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+            Novo Paciente
+        </a>
+    </div>
 </div>
 
 {% include "partials/_search_filter.html" with additional_filters="" %}
@@ -54,8 +60,10 @@
                             class="text-blue-600 hover:text-blue-900 mr-3">Detalhes</a>
                         <a href="{% url 'pacientes:update' paciente.id %}"
                             class="text-indigo-600 hover:text-indigo-900 mr-3">Editar</a>
-                        <a href="{% url 'pacientes:delete' paciente.id %}" class="text-red-600 hover:text-red-900"
-                            onclick="return confirmDelete('Tem certeza que deseja excluir este paciente?')">Excluir</a>
+                        <a href="{% url 'pacientes:delete' paciente.id %}" class="text-amber-600 hover:text-amber-900"
+                            onclick="return confirm('Tem certeza que deseja arquivar este paciente?');">
+                            Arquivar
+                        </a>
                     </td>
                 </tr>
                 {% empty %}
