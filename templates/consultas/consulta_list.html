@@ -117,6 +117,12 @@
                             class="text-blue-600 hover:text-blue-900 mr-3">Detalhes</a>
                         <a href="{% url 'consultas:update' consulta.id %}"
                             class="text-indigo-600 hover:text-indigo-900 mr-3">Editar</a>
+                        {% if perms.consultas.delete_consulta %}
+                            <a href="{% url 'consultas:delete' consulta.id %}?next={{ request.get_full_path|urlencode }}"
+                                class="text-red-600 hover:text-red-900 mr-3">
+                                Excluir
+                            </a>
+                        {% endif %}
 
                         <!-- Quick status buttons -->
                         <div class="inline-flex space-x-1">

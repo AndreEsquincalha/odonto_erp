@@ -103,6 +103,11 @@ class ConsultaDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView
         messages.success(self.request, "Consulta excluída.")
         return super().delete(request, *args, **kwargs)
 
+    def get_success_url(self):
+        # volta para a tela de onde veio (com filtros/página) se houver ?next=
+        nxt = self.request.POST.get("next") or self.request.GET.get("next")
+        return nxt or super().get_success_url()
+
 # Ações rápidas (mudar status)
 class ConsultaSetStatusView(LoginRequiredMixin, PermissionRequiredMixin, View):
     permission_required = "consultas.change_consulta"

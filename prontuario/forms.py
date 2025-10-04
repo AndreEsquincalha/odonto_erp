@@ -10,7 +10,7 @@ class OdontogramaForm(forms.ModelForm):
 class EvolucaoForm(forms.ModelForm):
     class Meta:
         model = EvolucaoClinica
-        fields = ["consulta", "usuario", "anotacao"]
+        fields = ["consulta", "anotacao"]
 
 class AnexoForm(forms.ModelForm):
     class Meta:

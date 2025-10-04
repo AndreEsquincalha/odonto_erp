@@ -1,10 +1,12 @@
 # prontuario/views.py
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.contrib import messages
 from .models import Odontograma, EvolucaoClinica, Anexo, Receita, TermoConsentimento
 from .forms import OdontogramaForm, EvolucaoForm, AnexoForm, ReceitaForm, TermoConsentimentoForm
+from consultas.models import Consulta
+from django import forms
 
 class OdontogramaListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     model = Odontograma
@@ -51,9 +53,53 @@ class EvolucaoCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView
     template_name = "prontuario/evolucao_form.html"
     permission_required = "prontuario.add_evolucaoclinica"
 
-    def get_success_url(self):
+    def dispatch(self, request, *args, **kwargs):
+        self.consulta_id = request.GET.get("consulta") or kwargs.get("consulta_id")
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_initial(self):
+        initial = super().get_initial()
+        if self.consulta_id:
+            initial["consulta"] = self.consulta_id
+        return initial
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        # se por algum motivo 'usuario' vier no form, esconda e preencha
+        if "usuario" in form.fields:
+            form.fields["usuario"].widget = forms.HiddenInput()
+            form.initial["usuario"] = self.request.user.pk
+        # se a consulta veio pela URL, esconda o campo
+        if "consulta" in form.fields and self.consulta_id:
+            form.fields["consulta"].widget = forms.HiddenInput()
+            form.initial["consulta"] = self.consulta_id
+        return form
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx["consulta"] = None
+        if self.consulta_id:
+            ctx["consulta"] = (
+                Consulta.objects.select_related("paciente")
+                .filter(pk=self.consulta_id)
+                .first()
+            )
+        ctx["next"] = self.request.GET.get("next")
+        return ctx
+
+    def form_valid(self, form):
+        # força o vínculo com o usuário logado e a consulta
+        form.instance.usuario = self.request.user
+        if self.consulta_id and not form.instance.consulta_id:
+            form.instance.consulta_id = int(self.consulta_id)
         messages.success(self.request, "Evolução registrada.")
-        return reverse_lazy("consultas:detail", kwargs={"pk": self.object.consulta_id})
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        nxt = self.request.POST.get("next") or self.request.GET.get("next")
+        if nxt:
+            return nxt
+        return reverse("consultas:detail", args=[self.object.consulta_id])
 
 # Anexo
 class AnexoCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
