@@ -9,7 +9,7 @@ from .forms import OdontogramaForm, EvolucaoForm, AnexoForm, ReceitaForm, TermoC
 class OdontogramaListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     model = Odontograma
     template_name = "prontuario/odontograma_list.html"
-    context_object_name = "registros"
+    context_object_name = "odontogramas"
     paginate_by = 30
     permission_required = "prontuario.view_odontograma"
 

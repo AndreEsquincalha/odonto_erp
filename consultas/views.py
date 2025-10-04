@@ -31,17 +31,39 @@ class ConsultaListView(LoginRequiredMixin, PermissionRequiredMixin, SearchMixin,
 
     def get_queryset(self):
         qs = super().get_queryset().select_related("paciente")
-        # filtros simples (status, data)
+
+        # --- NOVO: filtra pelo paciente se vier na querystring ---
+        paciente_id = self.request.GET.get("paciente")
+        if paciente_id:
+            try:
+                qs = qs.filter(paciente_id=int(paciente_id))
+            except (TypeError, ValueError):
+                # se vier algo inválido, simplesmente ignora o filtro
+                pass
+
+        # filtros existentes (status, datas)
         status = self.request.GET.get("status")
         if status:
             qs = qs.filter(status=status)
+
         start = self.request.GET.get("start")
         end = self.request.GET.get("end")
         if start:
             qs = qs.filter(inicio__date__gte=start)
         if end:
             qs = qs.filter(inicio__date__lte=end)
+
         return qs.order_by("inicio")
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        # --- OPCIONAL: manda o objeto Paciente pro template quando filtrado ---
+        paciente_id = self.request.GET.get("paciente")
+        ctx["paciente_filtro"] = None
+        if paciente_id and str(paciente_id).isdigit():
+            from pacientes.models import Paciente
+            ctx["paciente_filtro"] = Paciente.objects.filter(pk=paciente_id).first()
+        return ctx
 
 class ConsultaDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
     model = Consulta

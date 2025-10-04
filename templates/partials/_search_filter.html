@@ -1,5 +1,10 @@
 <div class="bg-white p-4 rounded-lg shadow mb-6">
     <form method="get" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <!-- Preserva o paciente quando houver na URL -->
+        {% if request.GET.paciente %}
+        <input type="hidden" name="paciente" value="{{ request.GET.paciente }}">
+        {% endif %}
+
         <!-- Search input -->
         <div>
             <label for="q" class="block text-sm font-medium text-gray-700 mb-1">Buscar</label>
@@ -8,7 +13,7 @@
                 placeholder="Digite para buscar...">
         </div>
 
-        <!-- Additional filters - will be customized per template -->
+        <!-- Additional filters - will be customizados per template -->
         {% block additional_filters %}{% endblock %}
 
         <!-- Buttons -->
